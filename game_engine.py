@@ -7,13 +7,9 @@ from map_loader import MapLoader
 
 
 class GameEngine:
-    """Manages game state and rules"""
-    
     def __init__(self, map_file):
-        # Load the map
         map_data = MapLoader.load_from_file(map_file)
         
-        # Set up the game board
         self.width = map_data['width']
         self.height = map_data['height']
         self.grid = map_data['grid']
@@ -22,23 +18,19 @@ class GameEngine:
         self.timed_blocks = map_data['timed_blocks']
         self.movable_blocks = map_data['movable_blocks']
         
-        # Set up game entities
         self.player_pos = map_data['player_pos']
         self.goal_pos = map_data['goal_pos']
         self.purple_total = map_data['purple_total']
         
-        # Game state
         self.move_count = 0
         self.purple_collected = 0
         self.game_over = False
         self.won = False
     
     def is_position_valid(self, row, col):
-        """Check if a position is within the map boundaries"""
         return 0 <= row < self.height and 0 <= col < self.width
     
     def can_player_enter(self, row, col):
-        """Check if the player can move to this position"""
         if not self.is_position_valid(row, col):
             return False
         

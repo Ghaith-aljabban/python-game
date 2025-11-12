@@ -19,7 +19,16 @@ class MapLoader:
             lines = f.readlines()
         
         height = len(lines)
-        width = max(len(line.rstrip()) for line in lines)
+        
+        # Parse lines into tokens (handle multi-char tokens like T:5)
+        tokenized_lines = []
+        max_width = 0
+        for line in lines:
+            tokens = MapLoader._tokenize_line(line.rstrip())
+            tokenized_lines.append(tokens)
+            max_width = max(max_width, len(tokens))
+        
+        width = max_width
         
         # Initialize all map layers
         map_data = {
@@ -35,15 +44,35 @@ class MapLoader:
             'movable_blocks': set()
         }
         
-        # Parse each character in the map
-        for row, line in enumerate(lines):
-            for col, char in enumerate(line.rstrip()):
-                MapLoader._parse_tile(char, row, col, map_data)
+        # Parse each token in the map
+        for row, tokens in enumerate(tokenized_lines):
+            for col, token in enumerate(tokens):
+                MapLoader._parse_tile(token, row, col, map_data)
         
         if map_data['player_pos'] is None:
             raise ValueError("Map must have a player starting position (P)")
         
         return map_data
+    
+    @staticmethod
+    def _tokenize_line(line):
+        """Split a line into tokens, handling multi-character tokens like T:5"""
+        tokens = []
+        i = 0
+        while i < len(line):
+            char = line[i]
+            # Check if it's a timed block (T followed by : and number)
+            if char == 'T' and i + 1 < len(line) and line[i + 1] == ':':
+                # Find the end of the number
+                j = i + 2
+                while j < len(line) and line[j].isdigit():
+                    j += 1
+                tokens.append(line[i:j])
+                i = j
+            else:
+                tokens.append(char)
+                i += 1
+        return tokens
     
     @staticmethod
     def _parse_tile(char, row, col, map_data):

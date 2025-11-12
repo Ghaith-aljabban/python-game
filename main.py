@@ -35,9 +35,6 @@ def main():
         pygame.quit()
         return
     
-    # Set up game clock
-    clock = pygame.time.Clock()
-    
     # Main game loop
     running = True
     while running:
@@ -47,15 +44,15 @@ def main():
                 running = False
             
             elif event.type == pygame.KEYDOWN:
-                # Movement controls
-                if event.key in [pygame.K_w, pygame.K_UP]:
+                if event.key == pygame.K_w:
                     game.try_move_player('up')
-                elif event.key in [pygame.K_s, pygame.K_DOWN]:
+                elif event.key == pygame.K_s:
                     game.try_move_player('down')
-                elif event.key in [pygame.K_a, pygame.K_LEFT]:
+                elif event.key == pygame.K_a:
                     game.try_move_player('left')
-                elif event.key in [pygame.K_d, pygame.K_RIGHT]:
+                elif event.key == pygame.K_d:
                     game.try_move_player('right')
+
                 
                 # Restart
                 elif event.key == pygame.K_r:
