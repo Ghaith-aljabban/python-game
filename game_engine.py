@@ -61,8 +61,8 @@ class GameEngine:
         
         cell = self.grid[row][col]
         
-        # Liquids can't pass through solid blocks
-        if cell in [WALL, MOVABLE, TIMED]:
+        # Liquids can't pass through solid blocks, purple points, goal, or timed blocks
+        if cell in [WALL, MOVABLE, TIMED, PURPLE, GOAL]:
             return False
         
         return True
@@ -168,11 +168,28 @@ class GameEngine:
     
     def _spread_all_liquids(self):
         """Spread water and lava to adjacent tiles"""
-        self._spread_liquid(self.water, "water")
-        self._spread_liquid(self.lava, "lava")
+        water_new_positions = self._calculate_liquid_spread(self.water)
+        lava_new_positions = self._calculate_liquid_spread(self.lava)
+        
+        # Check for water-lava collisions and create blocks
+        collision_positions = water_new_positions & lava_new_positions
+        for row, col in collision_positions:
+            # Create a movable block where water and lava meet
+            self.grid[row][col] = MOVABLE
+            self.movable_blocks.add((row, col))
+            # Remove from spread lists
+            water_new_positions.discard((row, col))
+            lava_new_positions.discard((row, col))
+        
+        # Apply the spread for remaining positions
+        for row, col in water_new_positions:
+            self.water[row][col] = True
+        
+        for row, col in lava_new_positions:
+            self.lava[row][col] = True
     
-    def _spread_liquid(self, liquid_grid, liquid_type):
-        """Spread a specific liquid to adjacent empty tiles"""
+    def _calculate_liquid_spread(self, liquid_grid):
+        """Calculate where a liquid will spread (without applying it)"""
         # Find all current liquid positions
         current_positions = []
         for row in range(self.height):
@@ -180,7 +197,7 @@ class GameEngine:
                 if liquid_grid[row][col]:
                     current_positions.append((row, col))
         
-        # Spread to adjacent tiles
+        # Calculate spread to adjacent tiles
         new_positions = set()
         for row, col in current_positions:
             for delta_row, delta_col in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -188,11 +205,11 @@ class GameEngine:
                 new_col = col + delta_col
                 
                 if self.can_liquid_flow_to(new_row, new_col):
-                    new_positions.add((new_row, new_col))
+                    # Only spread to empty positions (not already occupied by this liquid)
+                    if not liquid_grid[new_row][new_col]:
+                        new_positions.add((new_row, new_col))
         
-        # Apply the spread
-        for row, col in new_positions:
-            liquid_grid[row][col] = True
+        return new_positions
     
     def _check_player_death(self):
         """Check if the player has died from lava"""

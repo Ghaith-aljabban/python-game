@@ -54,6 +54,7 @@ class Renderer:
         x = col * TILE_SIZE
         y = row * TILE_SIZE
         rect = pygame.Rect(x, y, TILE_SIZE, TILE_SIZE)
+        cell = self.game.grid[row][col]
         
         # Draw the base layer
         pygame.draw.rect(surface, COLORS['empty'], rect)
@@ -62,9 +63,17 @@ class Renderer:
         if self._is_player_here(row, col):
             self._draw_player(rect, surface)
         elif self._is_lava_here(row, col):
-            self._draw_lava(rect, surface)
+            # If lava is over a barrier, show both clearly
+            if cell == BARRIER:
+                self._draw_lava_over_barrier(rect, surface)
+            else:
+                self._draw_lava(rect, surface)
         elif self._is_water_here(row, col):
-            self._draw_water(rect, surface)
+            # If water is over a barrier, show both clearly
+            if cell == BARRIER:
+                self._draw_water_over_barrier(rect, surface)
+            else:
+                self._draw_water(rect, surface)
         else:
             self._draw_static_tile(row, col, rect, surface)
         
@@ -96,6 +105,22 @@ class Renderer:
     def _draw_water(self, rect, surface):
         """Draw water"""
         pygame.draw.rect(surface, COLORS['water'], rect)
+    
+    def _draw_lava_over_barrier(self, rect, surface):
+        """Draw lava over a barrier - make it clearly visible"""
+        # Draw lava as base
+        pygame.draw.rect(surface, COLORS['lava'], rect)
+        # Draw bright barrier X pattern on top
+        pygame.draw.line(surface, (255, 255, 255), rect.topleft, rect.bottomright, 3)
+        pygame.draw.line(surface, (255, 255, 255), rect.topright, rect.bottomleft, 3)
+    
+    def _draw_water_over_barrier(self, rect, surface):
+        """Draw water over a barrier"""
+        # Draw water as base
+        pygame.draw.rect(surface, COLORS['water'], rect)
+        # Draw cyan barrier X pattern on top
+        pygame.draw.line(surface, COLORS['barrier'], rect.topleft, rect.bottomright, 2)
+        pygame.draw.line(surface, COLORS['barrier'], rect.topright, rect.bottomleft, 2)
     
     def _draw_static_tile(self, row, col, rect, surface):
         """Draw non-liquid, non-player tiles"""
