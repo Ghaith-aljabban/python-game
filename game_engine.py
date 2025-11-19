@@ -208,5 +208,38 @@ class GameEngine:
 
         return new_game
 
+    def get_valid_moves(self):
+
+        if self.game_over:
+            return []
+
+        valid_moves = []
+        directions = ['up', 'down', 'left', 'right']
+
+        for direction in directions:
+            row, col = self.player_pos
+            delta_row, delta_col = self._get_direction_delta(direction)
+            new_row = row + delta_row
+            new_col = col + delta_col
+
+            can_move = False
+
+            if self._is_movable_block_at(new_row, new_col):
+                push_row = new_row + delta_row
+                push_col = new_col + delta_col
+                if self.is_position_valid(push_row, push_col):
+                    target = self.grid[push_row][push_col]
+                    if (target == EMPTY or
+                        self.water[push_row][push_col] or
+                        self.lava[push_row][push_col]):
+                        can_move = True
+            elif self.can_player_enter(new_row, new_col):
+                can_move = True
+
+            if can_move:
+                valid_moves.append(direction)
+
+        return valid_moves
+
     def is_goal_unlocked(self):
         return self.purple_collected >= self.purple_total
