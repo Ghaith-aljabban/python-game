@@ -1,26 +1,18 @@
-"""
-Map loading functionality
-"""
 
 from config import *
 from game_objects import TimedBlock
 
 
 class MapLoader:
-    """Loads and parses game maps from text files"""
-    
+
     @staticmethod
     def load_from_file(map_file):
-        """
-        Load a map from a text file.
-        Returns a dictionary with all map data.
-        """
+
         with open(map_file, 'r') as f:
             lines = f.readlines()
         
         height = len(lines)
         
-        # Parse lines into tokens (handle multi-char tokens like T:5)
         tokenized_lines = []
         max_width = 0
         for line in lines:
@@ -30,7 +22,6 @@ class MapLoader:
         
         width = max_width
         
-        # Initialize all map layers
         map_data = {
             'width': width,
             'height': height,
@@ -44,7 +35,6 @@ class MapLoader:
             'movable_blocks': set()
         }
         
-        # Parse each token in the map
         for row, tokens in enumerate(tokenized_lines):
             for col, token in enumerate(tokens):
                 MapLoader._parse_tile(token, row, col, map_data)
@@ -56,14 +46,11 @@ class MapLoader:
     
     @staticmethod
     def _tokenize_line(line):
-        """Split a line into tokens, handling multi-character tokens like T:5"""
         tokens = []
         i = 0
         while i < len(line):
             char = line[i]
-            # Check if it's a timed block (T followed by : and number)
             if char == 'T' and i + 1 < len(line) and line[i + 1] == ':':
-                # Find the end of the number
                 j = i + 2
                 while j < len(line) and line[j].isdigit():
                     j += 1
@@ -76,7 +63,6 @@ class MapLoader:
     
     @staticmethod
     def _parse_tile(char, row, col, map_data):
-        """Parse a single tile character and update map data"""
         
         if char == PLAYER:
             map_data['player_pos'] = (row, col)
@@ -103,12 +89,10 @@ class MapLoader:
             map_data['movable_blocks'].add((row, col))
             
         elif char.startswith('T'):
-            # Parse timed block (format: T:5 means disappears after 5 turns)
             parts = char.split(':')
             turns = int(parts[1]) if len(parts) > 1 else 3
             map_data['timed_blocks'][(row, col)] = TimedBlock(turns)
             map_data['grid'][row][col] = TIMED
             
         else:
-            # Regular tiles (walls, barriers, empty spaces)
             map_data['grid'][row][col] = char

@@ -1,12 +1,11 @@
-"""
-Core game engine and logic
-"""
 
+import copy
 from config import *
 from map_loader import MapLoader
 
 
 class GameEngine:
+    
     def __init__(self, map_file):
         map_data = MapLoader.load_from_file(map_file)
         
@@ -36,55 +35,46 @@ class GameEngine:
         
         cell = self.grid[row][col]
         
-        # Can't walk through walls or barriers
         if cell in [WALL, BARRIER]:
             return False
         
-        # Can't enter locked goal
         if cell == GOAL and self.purple_collected < self.purple_total:
             return False
         
         return True
     
     def can_liquid_flow_to(self, row, col):
-        """Check if water or lava can spread to this position"""
         if not self.is_position_valid(row, col):
             return False
         
         cell = self.grid[row][col]
         
-        # Liquids can't pass through solid blocks, purple points, goal, or timed blocks
         if cell in [WALL, MOVABLE, TIMED, PURPLE, GOAL]:
             return False
         
         return True
     
     def try_move_player(self, direction):
-        """Attempt to move the player in a direction"""
         if self.game_over:
             return
         
-        # Calculate new position
         row, col = self.player_pos
         delta_row, delta_col = self._get_direction_delta(direction)
         new_row = row + delta_row
         new_col = col + delta_col
         
-        # Try to push a movable block if there is one
         if self._is_movable_block_at(new_row, new_col):
             if self._try_push_block(new_row, new_col, delta_row, delta_col):
                 self.player_pos = (new_row, new_col)
                 self._finish_turn()
             return
         
-        # Normal movement
         if self.can_player_enter(new_row, new_col):
             self.player_pos = (new_row, new_col)
-            self._handle_tile_interaction(new_row, new_col)
+            self._handle_win_interaction(new_row, new_col)
             self._finish_turn()
     
     def _get_direction_delta(self, direction):
-        """Convert a direction string to row/col delta"""
         directions = {
             'up': (-1, 0),
             'down': (1, 0),
@@ -94,86 +84,72 @@ class GameEngine:
         return directions.get(direction, (0, 0))
     
     def _is_movable_block_at(self, row, col):
-        """Check if there's a movable block at the position"""
         return (self.is_position_valid(row, col) and 
                 self.grid[row][col] == MOVABLE)
     
     def _try_push_block(self, block_row, block_col, delta_row, delta_col):
-        """Try to push a movable block in a direction"""
         push_row = block_row + delta_row
         push_col = block_col + delta_col
         
-        # Check if the push destination is valid
         if not self.is_position_valid(push_row, push_col):
             return False
         
         target = self.grid[push_row][push_col]
         
-        # Can only push into empty spaces without liquid
-        if (target == EMPTY and 
-            not self.water[push_row][push_col] and 
-            not self.lava[push_row][push_col]):
+        if (target == EMPTY or 
+             self.water[push_row][push_col] or 
+             self.lava[push_row][push_col]):
             
-            # Move the block
             self.grid[block_row][block_col] = EMPTY
             self.grid[push_row][push_col] = MOVABLE
+            self.water[push_row][push_col] = False
+            self.lava[push_row][push_col] = False
             self.movable_blocks.remove((block_row, block_col))
             self.movable_blocks.add((push_row, push_col))
             return True
         
         return False
     
-    def _handle_tile_interaction(self, row, col):
-        """Handle player interaction with the tile they moved to"""
+    def _handle_win_interaction(self, row, col):
         cell = self.grid[row][col]
         
-        # Collect purple point
         if cell == PURPLE:
             self.purple_collected += 1
             self.grid[row][col] = EMPTY
         
-        # Check for winning condition
         if cell == GOAL and self.purple_collected >= self.purple_total:
             self.won = True
             self.game_over = True
     
     def _finish_turn(self):
-        """Complete the turn after player moves"""
         self.move_count += 1
         self._update_timed_blocks()
         self._spread_all_liquids()
         self._check_player_death()
     
     def _update_timed_blocks(self):
-        """Update all timed blocks and remove expired ones"""
         expired = []
         
         for pos, block in self.timed_blocks.items():
             if block.countdown():
                 expired.append(pos)
         
-        # Remove expired blocks
         for pos in expired:
             row, col = pos
             self.grid[row][col] = EMPTY
             del self.timed_blocks[pos]
     
     def _spread_all_liquids(self):
-        """Spread water and lava to adjacent tiles"""
         water_new_positions = self._calculate_liquid_spread(self.water)
         lava_new_positions = self._calculate_liquid_spread(self.lava)
         
-        # Check for water-lava collisions and create blocks
         collision_positions = water_new_positions & lava_new_positions
         for row, col in collision_positions:
-            # Create a movable block where water and lava meet
-            self.grid[row][col] = MOVABLE
+            self.grid[row][col] = WALL
             self.movable_blocks.add((row, col))
-            # Remove from spread lists
             water_new_positions.discard((row, col))
             lava_new_positions.discard((row, col))
         
-        # Apply the spread for remaining positions
         for row, col in water_new_positions:
             self.water[row][col] = True
         
@@ -181,15 +157,12 @@ class GameEngine:
             self.lava[row][col] = True
     
     def _calculate_liquid_spread(self, liquid_grid):
-        """Calculate where a liquid will spread (without applying it)"""
-        # Find all current liquid positions
         current_positions = []
         for row in range(self.height):
             for col in range(self.width):
                 if liquid_grid[row][col]:
                     current_positions.append((row, col))
         
-        # Calculate spread to adjacent tiles
         new_positions = set()
         for row, col in current_positions:
             for delta_row, delta_col in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -197,20 +170,43 @@ class GameEngine:
                 new_col = col + delta_col
                 
                 if self.can_liquid_flow_to(new_row, new_col):
-                    # Only spread to empty positions (not already occupied by this liquid)
-                    if not liquid_grid[new_row][new_col]:
+                    if liquid_grid is self.water and not self.lava[new_row][new_col]:
+                        new_positions.add((new_row, new_col))
+                    elif liquid_grid is self.lava and not self.water[new_row][new_col]:
+                        new_positions.add((new_row, new_col))
+                    elif not self.water[new_row][new_col] and not self.lava[new_row][new_col]:
                         new_positions.add((new_row, new_col))
         
         return new_positions
     
     def _check_player_death(self):
-        """Check if the player has died from lava"""
         player_row, player_col = self.player_pos
-        
-        if self.lava[player_row][player_col]:
+
+        if self.lava[player_row][player_col] or self.grid[player_row][player_col] == WALL:
             self.game_over = True
             self.won = False
-    
+
+    def copy(self):
+        new_game = GameEngine.__new__(GameEngine)
+
+        new_game.width = self.width
+        new_game.height = self.height
+        new_game.grid = copy.deepcopy(self.grid)
+        new_game.water = copy.deepcopy(self.water)
+        new_game.lava = copy.deepcopy(self.lava)
+        new_game.timed_blocks = copy.deepcopy(self.timed_blocks)
+        new_game.movable_blocks = copy.deepcopy(self.movable_blocks)
+
+        new_game.player_pos = self.player_pos
+        new_game.goal_pos = self.goal_pos
+        new_game.purple_total = self.purple_total
+
+        new_game.move_count = self.move_count
+        new_game.purple_collected = self.purple_collected
+        new_game.game_over = self.game_over
+        new_game.won = self.won
+
+        return new_game
+
     def is_goal_unlocked(self):
-        """Check if the goal is unlocked (all purple collected)"""
         return self.purple_collected >= self.purple_total
