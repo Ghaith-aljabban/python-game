@@ -39,19 +39,24 @@ def main():
                 if event.key == pygame.K_w:
                     game.try_move_player('up')
                     game_stack.append(game.copy())
+                    print(GameEngine.get_valid_moves(game))
                 elif event.key == pygame.K_s:
                     game.try_move_player('down')
                     game_stack.append(game.copy())
+                    print(GameEngine.get_valid_moves(game))
                 elif event.key == pygame.K_a:
                     game.try_move_player('left')
                     game_stack.append(game.copy())
+                    print(GameEngine.get_valid_moves(game))
                 elif event.key == pygame.K_d:
                     game.try_move_player('right')
                     game_stack.append(game.copy())
+                    print(GameEngine.get_valid_moves(game))
 
                 elif event.key == pygame.K_r:
                     game = GameEngine(level_file)
                     renderer = Renderer(game)
+                    game_stack.clear()
 
                 elif event.key == pygame.K_q:
                     running = False
