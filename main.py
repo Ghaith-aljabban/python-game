@@ -21,7 +21,7 @@ def main():
         game = GameEngine(level_file)
         renderer = Renderer(game)
         game_stack.append(game.copy())
-        methods_for_algorithim.BFS(game.copy())
+        # methods_for_algorithim.BFS(game.copy())
     except FileNotFoundError:
         print(f"Error: Level file '{level_file}' not found!")
         pygame.quit()
@@ -59,11 +59,12 @@ def main():
                     game = GameEngine(level_file)
                     renderer = Renderer(game)
                     game_stack.clear()
+                    game_stack.append(game.copy())
 
                 elif event.key == pygame.K_q:
                     running = False
                 elif event.key == pygame.K_z:
-                    if len(game_stack) > 0:
+                    if len(game_stack) > 1:
                         game_stack.pop()
                         game = game_stack[-1].copy()
                         renderer = Renderer(game)

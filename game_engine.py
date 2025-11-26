@@ -35,7 +35,7 @@ class GameEngine:
         
         cell = self.grid[row][col]
         
-        if cell in [WALL, BARRIER]:
+        if cell in [WALL, BARRIER,TIMED]:
             return False
         
         if cell == GOAL and self.purple_collected < self.purple_total:
