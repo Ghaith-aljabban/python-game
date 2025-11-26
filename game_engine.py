@@ -63,11 +63,11 @@ class GameEngine:
         new_row = row + delta_row
         new_col = col + delta_col
         
-        # if self._is_movable_block_at(new_row, new_col):
-        #     if self._try_push_block(new_row, new_col, delta_row, delta_col):
-        #         self.player_pos = (new_row, new_col)
-        #         self._finish_turn()
-        #     return
+        if self._is_movable_block_at(new_row, new_col):
+            if self._try_push_block(new_row, new_col, delta_row, delta_col):
+                self.player_pos = (new_row, new_col)
+                self._finish_turn()
+            return
         
         if self.can_player_enter(new_row, new_col):
             self.player_pos = (new_row, new_col)
@@ -214,7 +214,7 @@ class GameEngine:
             return []
 
         valid_moves = []
-        directions = ['up', 'down', 'left', 'right']
+        directions = ['right', 'down', 'left','up' ]
 
         for direction in directions:
             row, col = self.player_pos
@@ -243,3 +243,7 @@ class GameEngine:
 
     def is_goal_unlocked(self):
         return self.purple_collected >= self.purple_total
+
+
+    def transmission_function(self,direction):
+        return self.try_move_player(direction)
