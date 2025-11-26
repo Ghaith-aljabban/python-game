@@ -85,13 +85,13 @@ class Renderer:
     
     def _draw_lava_over_barrier(self, rect, surface):
         pygame.draw.rect(surface, COLORS['lava'], rect)
-        pygame.draw.line(surface, (255, 255, 255), rect.topleft, rect.bottomright, 3)
-        pygame.draw.line(surface, (255, 255, 255), rect.topright, rect.bottomleft, 3)
+        pygame.draw.line(surface, (255, 255, 255), rect.topleft, rect.bottomright, 5)
+        pygame.draw.line(surface, (255, 255, 255), rect.topright, rect.bottomleft, 5)
     
     def _draw_water_over_barrier(self, rect, surface):
         pygame.draw.rect(surface, COLORS['water'], rect)
-        pygame.draw.line(surface, COLORS['barrier'], rect.topleft, rect.bottomright, 2)
-        pygame.draw.line(surface, COLORS['barrier'], rect.topright, rect.bottomleft, 2)
+        pygame.draw.line(surface, COLORS['barrier'], rect.topleft, rect.bottomright, 5)
+        pygame.draw.line(surface, COLORS['barrier'], rect.topright, rect.bottomleft, 5)
     
     def _draw_static_tile(self, row, col, rect, surface):
         cell = self.game.grid[row][col]
@@ -113,8 +113,8 @@ class Renderer:
             
         elif cell == BARRIER:
             pygame.draw.rect(surface, COLORS['empty'], rect)
-            pygame.draw.line(surface, COLORS['barrier'], rect.topleft, rect.bottomright, 2)
-            pygame.draw.line(surface, COLORS['barrier'], rect.topright, rect.bottomleft, 2)
+            pygame.draw.line(surface, COLORS['barrier'], rect.topleft, rect.bottomright, 5)
+            pygame.draw.line(surface, COLORS['barrier'], rect.topright, rect.bottomleft, 5)
             
         elif cell == TIMED:
             pygame.draw.rect(surface, COLORS['timed'], rect)
@@ -147,7 +147,8 @@ class Renderer:
         
         moves_text = self.font_medium.render(f"Moves: {self.game.move_count}", True, COLORS['text'])
         self.screen.blit(moves_text, (20, y_pos))
-        
+
+
         purple_color = COLORS['purple'] if self.game.purple_collected == self.game.purple_total else COLORS['text']
         purple_text = self.font_medium.render(
             f"Purple: {self.game.purple_collected}/{self.game.purple_total}", 
@@ -161,7 +162,7 @@ class Renderer:
         goal_text = self.font_small.render(f"Goal: {goal_status}", True, goal_color)
         self.screen.blit(goal_text, (self.window_width - 200, y_pos))
         
-        controls_text = self.font_small.render("WASD/Arrows: Move | Q: Quit | R: Restart", True, (150, 150, 150))
+        controls_text = self.font_small.render(f"WASD/Arrows: Move | Q: Quit | R: Restart | Z: Undo | Available moves: {', '.join(map(str, self.game.get_valid_moves()))}", True, (150, 150, 150))
         self.screen.blit(controls_text, (20, y_pos + 35))
     
     def _draw_game_over_screen(self):

@@ -9,7 +9,6 @@ def BFS(gameEngine):
     gameStatesQueue.append(iniState)
     visitedStates.add(iniState)
     while gameStatesQueue:
-        print(f"{gameStatesQueue} \n")
         currentState = gameStatesQueue.popleft()
         availableMoves = currentState.get_valid_moves()
         for move in availableMoves:
