@@ -162,9 +162,12 @@ class Renderer:
         goal_text = self.font_small.render(f"Goal: {goal_status}", True, goal_color)
         self.screen.blit(goal_text, (self.window_width - 200, y_pos))
         
-        controls_text = self.font_small.render(f"WASD/Arrows: Move | Q: Quit | R: Restart | G: Solve game | Z: Undo | Available moves: {', '.join(map(str, self.game.get_valid_moves()))}", True, (150, 150, 150))
+        controls_text = self.font_small.render(f"WASD/Arrows: Move | Q: Quit | R: Restart | G: Solve game | Z: Undo", True, (150, 150, 150))
         self.screen.blit(controls_text, (20, y_pos + 35))
-    
+
+        moves_text = self.font_small.render(f"Available moves: {', '.join(map(str, self.game.get_valid_moves()))}", True, (150, 150, 150))
+        self.screen.blit(moves_text, (20, y_pos + 55))
+            
     def _draw_game_over_screen(self):
         overlay = pygame.Surface((self.window_width, self.board_height))
         overlay.set_alpha(200)

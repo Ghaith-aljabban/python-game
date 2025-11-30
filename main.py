@@ -69,6 +69,7 @@ def main():
                     for move in gameSolution:
                         pygame.time.delay(400)
                         game.try_move_player(move)
+                        game_stack.append(game.copy())
                         renderer.draw_frame()
         renderer.draw_frame()
     
