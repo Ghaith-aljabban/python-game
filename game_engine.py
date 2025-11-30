@@ -170,7 +170,7 @@ class GameEngine:
                 new_col = col + delta_col
                 
                 if self.can_liquid_flow_to(new_row, new_col):
-                    if liquid_grid is self.water and not self.lava[new_row][new_col]:
+                    if liquid_grid is self.water :
                         new_positions.add((new_row, new_col))
                     elif liquid_grid is self.lava and not self.water[new_row][new_col]:
                         new_positions.add((new_row, new_col))
@@ -210,11 +210,18 @@ class GameEngine:
 
     def get_state_tuple(self):
         return (
-            self.player_pos,  # (x, y)
+            self.player_pos,
             self.purple_collected,
             self.move_count,
-            tuple(tuple(pos) for pos in self.lava) if hasattr(self, 'lava') and self.lava else (),
-            
+            tuple(tuple(row) for row in self.grid),
+            tuple(tuple(row) for row in self.water),
+            tuple(tuple(row) for row in self.lava),
+            tuple((pos, block.turns_remaining) for pos, block in self.timed_blocks.items()),
+            tuple(self.movable_blocks),
+            self.goal_pos,
+            self.purple_total,
+            self.game_over,
+            self.won
         )
 
     def __hash__(self):

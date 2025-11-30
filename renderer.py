@@ -68,7 +68,7 @@ class Renderer:
         return (row, col) == self.game.player_pos
     
     def _is_lava_here(self, row, col):
-        return self.game.lava[row][col]
+        return self.game.lava[row][col] and not self.game.grid[row][col] == WALL
     
     def _is_water_here(self, row, col):
         return self.game.water[row][col]

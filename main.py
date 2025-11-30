@@ -22,7 +22,7 @@ def main():
         game = GameEngine(level_file)
         renderer = Renderer(game)
         game_stack.append(game.copy())
-        print(intelligent_search_engine.DFS_with_moves(game.copy()))
+        print(intelligent_search_engine.BFS(game.copy()))
     except FileNotFoundError:
         print(f"Error: Level file '{level_file}' not found!")
         pygame.quit()

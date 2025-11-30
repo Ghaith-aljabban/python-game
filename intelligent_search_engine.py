@@ -2,7 +2,7 @@ import game_engine
 from collections import deque 
 import time
 
-def BFS_with_moves(gameEngine):
+def BFS(gameEngine):
     start_time = time.time()  
     iniState = gameEngine.copy()
     visitedStates = set()
@@ -34,9 +34,7 @@ def BFS_with_moves(gameEngine):
     print(f"no solution found after searching in {len(visitedStates)} state within {elapsed_time:.4f} seconds")
     return None, []  
 
-
-
-def DFS_with_moves(gameEngine):
+def DFS(gameEngine):
     start_time = time.time()  
     iniState = gameEngine.copy()
     visitedStates = set()
@@ -67,3 +65,4 @@ def DFS_with_moves(gameEngine):
     elapsed_time = end_time - start_time
     print(f"no solution found after searching in {len(visitedStates)} state within {elapsed_time:.4f} seconds")
     return None, []  
+
