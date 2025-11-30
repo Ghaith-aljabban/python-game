@@ -208,6 +208,24 @@ class GameEngine:
 
         return new_game
 
+    def get_state_tuple(self):
+        return (
+            self.player_pos,  # (x, y)
+            self.purple_collected,
+            self.move_count,
+            tuple(tuple(pos) for pos in self.lava) if hasattr(self, 'lava') and self.lava else (),
+            
+        )
+
+    def __hash__(self):
+        return hash(self.get_state_tuple())
+
+    def __eq__(self, other):
+        if not isinstance(other, GameEngine):
+            return False
+        return self.get_state_tuple() == other.get_state_tuple()
+
+
     def get_valid_moves(self):
 
         if self.game_over:

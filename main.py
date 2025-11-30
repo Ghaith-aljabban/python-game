@@ -1,9 +1,10 @@
 import pygame
 import sys
-import methods_for_algorithim
+import intelligent_search_engine
 from game_engine import GameEngine
 from renderer import Renderer
 from config import FPS
+import test
 
 
 def main():
@@ -21,7 +22,7 @@ def main():
         game = GameEngine(level_file)
         renderer = Renderer(game)
         game_stack.append(game.copy())
-        # methods_for_algorithim.BFS(game.copy())
+        print(intelligent_search_engine.DFS_with_moves(game.copy()))
     except FileNotFoundError:
         print(f"Error: Level file '{level_file}' not found!")
         pygame.quit()
