@@ -6,7 +6,6 @@ from renderer import Renderer
 from config import FPS
 import test
 
-
 def main():
     if len(sys.argv) < 2:
         print("Usage: python main.py <level_file>")
@@ -22,7 +21,7 @@ def main():
         game = GameEngine(level_file)
         renderer = Renderer(game)
         game_stack.append(game.copy())
-        print(intelligent_search_engine.BFS(game.copy()))
+        
     except FileNotFoundError:
         print(f"Error: Level file '{level_file}' not found!")
         pygame.quit()
@@ -65,7 +64,12 @@ def main():
                         game_stack.pop()
                         game = game_stack[-1].copy()
                         renderer = Renderer(game)
-        
+                elif event.key == pygame.K_g:
+                    gameSolution = intelligent_search_engine.BFS(game.copy())
+                    for move in gameSolution:
+                        pygame.time.delay(400)
+                        game.try_move_player(move)
+                        renderer.draw_frame()
         renderer.draw_frame()
     
     pygame.quit()

@@ -162,7 +162,7 @@ class Renderer:
         goal_text = self.font_small.render(f"Goal: {goal_status}", True, goal_color)
         self.screen.blit(goal_text, (self.window_width - 200, y_pos))
         
-        controls_text = self.font_small.render(f"WASD/Arrows: Move | Q: Quit | R: Restart | Z: Undo | Available moves: {', '.join(map(str, self.game.get_valid_moves()))}", True, (150, 150, 150))
+        controls_text = self.font_small.render(f"WASD/Arrows: Move | Q: Quit | R: Restart | G: Solve game | Z: Undo | Available moves: {', '.join(map(str, self.game.get_valid_moves()))}", True, (150, 150, 150))
         self.screen.blit(controls_text, (20, y_pos + 35))
     
     def _draw_game_over_screen(self):

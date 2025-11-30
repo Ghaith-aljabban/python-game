@@ -23,7 +23,7 @@ def BFS(gameEngine):
                 elapsed_time = end_time - start_time
                 print(f"solution found after searching in {len(visitedStates)} state within {elapsed_time:.4f} seconds")
 
-                return newState, moves_so_far + [move]
+                return moves_so_far + [move]
             
             if newState not in visitedStates:
                 new_moves_path = moves_so_far + [move]
@@ -32,18 +32,18 @@ def BFS(gameEngine):
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"no solution found after searching in {len(visitedStates)} state within {elapsed_time:.4f} seconds")
-    return None, []  
+    return  []  
 
 def DFS(gameEngine):
     start_time = time.time()  
     iniState = gameEngine.copy()
     visitedStates = set()
-    gameStatesQueue = deque()
-    gameStatesQueue.append((iniState, []))  
+    gameStatesStack = deque()
+    gameStatesStack.append((iniState, []))  
     visitedStates.add(iniState)
-
-    while gameStatesQueue:
-        currentState, moves_so_far = gameStatesQueue.pop()
+    
+    while gameStatesStack:
+        currentState, moves_so_far = gameStatesStack.pop()
         availableMoves = currentState.get_valid_moves()
         
         for move in availableMoves:
@@ -55,14 +55,14 @@ def DFS(gameEngine):
                 elapsed_time = end_time - start_time
                 print(f"solution found after searching in {len(visitedStates)} state within {elapsed_time:.4f} seconds")
 
-                return newState, moves_so_far + [move]
+                return moves_so_far + [move]
             
             if newState not in visitedStates:
                 new_moves_path = moves_so_far + [move]
-                gameStatesQueue.append((newState, new_moves_path))
+                gameStatesStack.append((newState, new_moves_path))
                 visitedStates.add(newState)
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"no solution found after searching in {len(visitedStates)} state within {elapsed_time:.4f} seconds")
-    return None, []  
+    return  []  
 
