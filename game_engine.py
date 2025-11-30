@@ -212,7 +212,6 @@ class GameEngine:
         return (
             self.player_pos,
             self.purple_collected,
-            self.move_count,
             tuple(tuple(row) for row in self.grid),
             tuple(tuple(row) for row in self.water),
             tuple(tuple(row) for row in self.lava),
