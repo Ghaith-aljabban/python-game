@@ -230,6 +230,8 @@ class GameEngine:
         if not isinstance(other, GameEngine):
             return False
         return self.get_state_tuple() == other.get_state_tuple()
+    def __gt__(self, other):
+        return False
 
 
     def get_valid_moves(self):
@@ -271,3 +273,15 @@ class GameEngine:
 
     def transmission_function(self,direction):
         return self.try_move_player(direction)
+
+
+
+
+
+    def number_of_lava_block(self):
+        count = 0
+        for lavaRow in self.lava:
+            for lavaBlock in lavaRow:
+                if lavaBlock == True :
+                    count += 1
+        return count

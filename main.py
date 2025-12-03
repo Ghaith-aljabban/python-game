@@ -65,7 +65,7 @@ def main():
                         game = game_stack[-1].copy()
                         renderer = Renderer(game)
                 elif event.key == pygame.K_g:
-                    gameSolution = intelligent_search_engine.DFS(game.copy())
+                    gameSolution = intelligent_search_engine.UCS(game.copy())
                     for move in gameSolution:
                         pygame.time.delay(400)
                         game.try_move_player(move)
