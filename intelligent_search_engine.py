@@ -40,7 +40,6 @@ def BFS(gameEngine):
     print(f"no solution found after searching in {len(GeneratedStates)} state within {elapsed_time:.4f} seconds")
     return  []  
 
-
 def DFS(gameEngine):
     counter = 0
     start_time = time.time()  
@@ -78,6 +77,8 @@ def DFS(gameEngine):
     print(f"no solution found after searching in {len(GeneratedStates)} state within {elapsed_time:.4f} seconds")
     return  []  
 
+def _calculate_penalty(state, moves_so_far):
+    return len(moves_so_far) + state.number_of_lava_block() 
 
 def UCS(gameEngine):
     counter = 0
@@ -85,7 +86,7 @@ def UCS(gameEngine):
     iniState = gameEngine.copy()
     GeneratedStates = set()
     gameStatesQueue = []
-    heapq.heappush(gameStatesQueue ,(0 + iniState.number_of_lava_block() , iniState , []))  
+    heapq.heappush(gameStatesQueue ,(_calculate_penalty(iniState,[]) , iniState , []))  
     GeneratedStates.add(iniState)
     
     while heapq:
@@ -109,7 +110,7 @@ def UCS(gameEngine):
             
             if newState not in GeneratedStates:
                 new_moves_path = moves_so_far + [move]
-                gameStatesQueue.append((len(new_moves_path) + newState.number_of_lava_block(),newState, new_moves_path))
+                heapq.heappush(gameStatesQueue,(_calculate_penalty(newState,new_moves_path),newState, new_moves_path))
                 GeneratedStates.add(newState)
     end_time = time.time()
     elapsed_time = end_time - start_time
