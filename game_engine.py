@@ -230,9 +230,9 @@ class GameEngine:
         if not isinstance(other, GameEngine):
             return False
         return self.get_state_tuple() == other.get_state_tuple()
+    
     def __gt__(self, other):
         return False
-
 
     def get_valid_moves(self):
 
@@ -270,13 +270,8 @@ class GameEngine:
     def is_goal_unlocked(self):
         return self.purple_collected >= self.purple_total
 
-
     def transmission_function(self,direction):
         return self.try_move_player(direction)
-
-
-
-
 
     def number_of_lava_block(self):
         count = 0
@@ -285,3 +280,18 @@ class GameEngine:
                 if lavaBlock == True :
                     count += 1
         return count
+    
+
+    def number_of_water_block(self):
+        count = 0
+        for waterRow in self.water:
+            for waterBlock in waterRow:
+                if waterBlock == True :
+                    count += 1
+        return count
+    
+
+    def heuristic(self):
+        deltaX , deltaY =self.player_pos[0] - self.goal_pos[0],self.player_pos[1] - self.goal_pos[1]
+        print(abs(deltaX) + abs(deltaY))
+        return abs(deltaX) + abs(deltaY)
