@@ -66,7 +66,7 @@ def main():
                         renderer = Renderer(game)
                 elif event.key == pygame.K_g:
                     pygame.event.pump()
-                    gameSolution = intelligent_search_engine.UCS(game.copy())
+                    gameSolution = intelligent_search_engine.A_star(game.copy())
                     for move in gameSolution:
                         pygame.time.delay(400)
                         pygame.event.pump()

@@ -119,3 +119,42 @@ def UCS(gameEngine):
     elapsed_time = end_time - start_time
     print(f"no solution found after searching in {len(GeneratedStates)} state within {elapsed_time:.4f} seconds")
     return  []  
+def a_star_priority(state, moves_so_far):
+    return len(moves_so_far) + state.heuristic()
+def A_star(gameEngine):
+    counter = 0
+    start_time = time.time()  
+    iniState = gameEngine.copy()
+    GeneratedStates = set()
+    gameStatesQueue = []
+    heapq.heappush(gameStatesQueue ,(a_star_priority(iniState,[]) , iniState , []))  
+    GeneratedStates.add(iniState)
+    
+    while heapq:
+        counter += 1
+        penalty ,currentState, moves_so_far = heapq.heappop(gameStatesQueue)
+        availableMoves = currentState.get_valid_moves()
+        if len(GeneratedStates) >= 150000 :
+                print('overload')
+                break
+        for move in availableMoves:
+            newState = currentState.copy()
+            newState.try_move_player(move)
+            if newState.game_over:
+                if newState.won:
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    print(f"solution found after searching in {len(GeneratedStates)} state within {elapsed_time:.4f} seconds")
+                    print(f"Visited  state {counter}")
+                    print(f"solution len {len(moves_so_far) + 1}")
+                    return moves_so_far + [move]
+                continue
+            if newState not in GeneratedStates:
+                newState.heuristic()
+                new_moves_path = moves_so_far + [move]
+                heapq.heappush(gameStatesQueue,(a_star_priority(newState,new_moves_path),newState, new_moves_path))
+                GeneratedStates.add(newState)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"no solution found after searching in {len(GeneratedStates)} state within {elapsed_time:.4f} seconds")
+    return  []  

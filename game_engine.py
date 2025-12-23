@@ -292,6 +292,6 @@ class GameEngine:
     
 
     def heuristic(self):
+        
         deltaX , deltaY =self.player_pos[0] - self.goal_pos[0],self.player_pos[1] - self.goal_pos[1]
-        print(abs(deltaX) + abs(deltaY))
         return abs(deltaX) + abs(deltaY)
